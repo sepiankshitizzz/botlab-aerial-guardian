@@ -2,79 +2,139 @@
 
 ## 📌 Overview
 
-This project implements a real-time multi-person tracking system using computer vision techniques. The system detects people in video frames, assigns consistent IDs across frames, and visualizes their movement using trajectory paths.
+This project implements a real-time multi-person tracking system using YOLOv8 and a custom centroid-based tracking algorithm. The system detects persons in video frames, assigns persistent IDs across frames, and visualizes movement trajectories.
 
-The goal was to build an efficient and explainable tracking pipeline suitable for applications such as drone surveillance and crowd monitoring.
+The objective was to create a lightweight and explainable tracking pipeline suitable for drone-based surveillance scenarios where camera motion, small targets, and tracking consistency are challenging problems.
 
 ---
 
 ## ⚙️ System Pipeline
 
-Input Video → YOLOv8 Detection → Centroid-Based Tracking → ID Assignment → Trajectory Visualization → Output Video
+Input Video → YOLOv8 Person Detection → Centroid Extraction → ID Matching → Trajectory Visualization → Output Video
 
 ---
 
-## 🧠 Key Components
+## 🧠 Architecture Choice
 
-### 🔹 Object Detection
+### Detection Model
 
-* Model: YOLOv8 (lightweight version)
-* Detects multiple persons per frame with bounding boxes and confidence scores.
+* YOLOv8n (Nano version)
+* Lightweight architecture suitable for real-time applications
+* Fast inference speed with low memory usage
+* Chosen to satisfy edge-device deployment requirements
 
-### 🔹 Tracking (Custom Implementation)
+### Tracking Algorithm
 
-* Implemented a centroid-based tracking approach.
-* Each detected object is assigned a unique ID.
-* Matching between frames is done using Euclidean distance between object centroids.
+A custom centroid-based tracker was implemented.
 
-### 🔹 Trajectory Visualization
+Workflow:
 
-* Stores previous positions of each tracked ID.
-* Draws path lines to show movement across frames.
-* Helps analyze motion patterns and object movement.
+1. Detect persons using YOLOv8.
+2. Compute centroid of each detected bounding box.
+3. Compare centroids with previous frame detections.
+4. Assign the nearest matching ID using Euclidean distance.
+5. Maintain trajectory history for visualization.
+
+This approach is lightweight and computationally efficient compared to appearance-based trackers.
+
+---
+
+## 🔹 Object Detection
+
+* Model: YOLOv8n
+* Target Class: Person
+* Bounding boxes generated for detected persons
+* Lightweight architecture selected for drone deployment scenarios
+
+---
+
+## 🔹 Tracking
+
+* Custom centroid-based tracking algorithm
+* Unique IDs assigned to each detected person
+* Euclidean-distance matching between consecutive frames
+* Previous track information retained to reduce ID loss
+
+---
+
+## 🔹 Trajectory Visualization
+
+* Historical positions stored for each track
+* Trajectory lines drawn using previous centroids
+* Visual representation of movement patterns over time
 
 ---
 
 ## ⚠️ Challenges Faced
 
-* **ID Instability:** Same person getting different IDs across frames due to motion and detection variation.
-* **Camera Movement:** Camera motion affected tracking consistency.
-* **Detection Noise:** Small changes in bounding boxes caused tracking mismatches.
+### ID Switching
+
+Fast movement, temporary occlusions, and camera motion occasionally caused incorrect ID assignments.
+
+### Drone Ego-Motion
+
+Because the camera itself is moving, object positions can change significantly between frames, making tracking more difficult.
+
+### Detection Noise
+
+Small variations in bounding-box positions may cause tracking inconsistencies.
 
 ---
 
-## 🛠️ Improvements Made
+## 🛠️ Mitigation Strategies
 
-* Increased distance threshold for better matching.
-* Added persistence of previous tracks to reduce ID loss.
-* Implemented trajectory visualization for better analysis.
-* Improved tracking stability through track-history maintenance.
+To reduce ID switching:
+
+* Increased centroid matching threshold
+* Retained previous track information
+* Maintained short trajectory history
+* Applied nearest-centroid matching between frames
+
+While effective for lightweight tracking, appearance-based approaches such as DeepSORT would further improve robustness.
 
 ---
 
-## 🚀 Future Improvements
+## 📊 Performance
 
-* Integrate DeepSORT for appearance-based tracking.
-* Use Kalman Filters for motion prediction.
-* Improve small-object detection for drone footage.
-* Optimize FPS for real-time deployment.
-* Handle occlusions more effectively.
+### Hardware Used
+
+* Apple MacBook Air
+* Python 3.x
+* YOLOv8n
+
+### Performance Notes
+
+* Lightweight model selected for real-time processing
+* Performance depends on hardware configuration and video resolution
+* Designed to prioritize inference speed while maintaining acceptable tracking quality
+
+---
+
+## 🚀 Edge Deployment Strategy
+
+For deployment on edge hardware such as NVIDIA Jetson:
+
+* Convert model to TensorRT format
+* Apply INT8 quantization
+* Reduce input resolution when necessary
+* Use GPU acceleration available on Jetson devices
+* Optimize inference pipeline for low-power environments
+
+YOLOv8n was selected because of its small size and suitability for edge deployment.
 
 ---
 
 ## 📊 Output
 
-The system generates an output video:
+Generated output:
 
-```text
 final_output.mp4
-```
 
-The output includes:
+Output includes:
 
-* Bounding boxes around detected persons
-* Unique IDs for each person
-* Trajectory paths showing movement
+* Person bounding boxes
+* Persistent ID labels
+* Movement trajectory visualization
 
 ---
 
@@ -86,15 +146,15 @@ The output includes:
 pip install -r requirements.txt
 ```
 
-### Run the Tracker
+### Run
 
 ```bash
-python advanced_track.py
+python3 advanced_track.py
 ```
 
 ### Input
 
-Place your video file in the project directory as:
+Place the video in the project directory as:
 
 ```text
 input.mp4
@@ -102,7 +162,7 @@ input.mp4
 
 ### Output
 
-The processed video will be saved as:
+Generated file:
 
 ```text
 final_output.mp4
@@ -112,14 +172,26 @@ final_output.mp4
 
 ## 💡 Key Learnings
 
-* Understanding the difference between object detection and object tracking.
-* Implementing a custom tracking algorithm using centroid matching.
-* Handling challenges such as ID switching and tracking instability.
-* Balancing tracking accuracy and computational efficiency.
-* Building an end-to-end computer vision pipeline.
+* Difference between object detection and tracking
+* Centroid-based multi-object tracking
+* Challenges caused by camera motion
+* ID-switching mitigation techniques
+* Trade-offs between accuracy and computational efficiency
+* Designing lightweight computer vision systems for deployment
+
+---
+
+## 🚀 Future Improvements
+
+* DeepSORT integration
+* ByteTrack integration
+* Kalman Filter motion prediction
+* Improved handling of occlusions
+* Small-object optimization for aerial imagery
+* TensorRT deployment pipeline
 
 ---
 
 ## 🏁 Conclusion
 
-This project demonstrates a complete end-to-end multi-person tracking pipeline using YOLOv8 and a custom centroid-based tracker. The project highlights practical challenges in real-world tracking systems and explores methods for improving robustness, scalability, and tracking accuracy.
+This project demonstrates a lightweight end-to-end multi-person tracking pipeline using YOLOv8 and centroid-based tracking. The system balances simplicity, speed, and interpretability while addressing common challenges encountered in drone-based surveillance applications.
