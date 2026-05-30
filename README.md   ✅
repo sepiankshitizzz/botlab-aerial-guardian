@@ -1,0 +1,94 @@
+# Real-Time Multi-Person Tracking System with Trajectory Visualization
+
+## 📌 Overview
+This project implements a real-time multi-person tracking system using computer vision techniques. The system detects people in video frames, assigns consistent IDs across frames, and visualizes their movement using trajectory paths.
+
+The goal was to build an efficient and explainable tracking pipeline suitable for applications such as drone surveillance and crowd monitoring.
+
+---
+
+## ⚙️ System Pipeline
+1. Video input is processed frame-by-frame using OpenCV.
+2. YOLOv8 is used for person detection.
+3. A custom centroid-based tracking algorithm assigns IDs to detected persons.
+4. Trajectory lines are drawn to visualize movement over time.
+5. The processed video is saved as output.
+
+---
+
+## 🧠 Key Components
+
+### 🔹 Object Detection
+- Model: YOLOv8 (lightweight version)
+- Detects multiple persons per frame with bounding boxes and confidence scores.
+
+### 🔹 Tracking (Custom Implementation)
+- Implemented a centroid-based tracking approach.
+- Each detected object is assigned a unique ID.
+- Matching between frames is done using Euclidean distance.
+
+### 🔹 Trajectory Visualization
+- Stores previous positions of each tracked ID.
+- Draws path lines to show movement across frames.
+- Helps analyze motion patterns.
+
+---
+
+## ⚠️ Challenges Faced
+- **ID Instability**: Same person getting different IDs across frames due to motion and detection variation.
+- **Camera Movement**: Movement of the camera affected tracking consistency.
+- **Detection Noise**: Small changes in bounding boxes caused tracking mismatches.
+
+---
+
+## 🛠️ Improvements Made
+- Increased distance threshold for better matching.
+- Added persistence of previous tracks to reduce ID loss.
+- Implemented trajectory visualization for better analysis.
+
+---
+
+## 🚀 Future Improvements
+- Integrate appearance-based tracking (DeepSORT).
+- Use Kalman Filter for motion prediction.
+- Improve small object detection for drone footage.
+- Optimize FPS for real-time deployment.
+
+---
+
+## 📊 Output
+The system generates an output video:
+final_output.mp4
+
+The output includes:
+- Bounding boxes around detected persons
+- Unique IDs for each person
+- Trajectory paths showing movement
+
+---
+
+## 🔧 How to Run
+1. Install dependencies:
+pip install ultralytics opencv-python
+
+2. Place input video in project folder:
+input.mp4
+
+3. Run the script:
+python advanced_track.py
+
+4. Output will be saved as:
+final_output.mp4
+
+---
+
+## 💡 Key Learnings
+- Understanding the difference between detection and tracking
+- Handling real-world challenges like ID switching
+- Importance of balancing accuracy and performance
+- Building custom solutions instead of relying only on libraries
+
+---
+
+## 🏁 Conclusion
+This project demonstrates a complete end-to-end multi-object tracking pipeline. It highlights both implementation and understanding of real-world limitations in tracking systems.
